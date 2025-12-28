@@ -350,7 +350,6 @@
         <div class="stats">
           <div>客戶數：<b id="stat_customer_count"></b> 人</div>
           <div>平均消費金額：約 <b id="stat_avg_amount"></b> 元</div>
-          <div>最近回購間隔：約 <b id="stat_avg_recency"></b> 天</div>
           <div>流失比例：<b id="stat_churn_pct"></b></div>
         </div>
 
@@ -558,8 +557,6 @@
     document.getElementById("insightTitle").textContent = titleText;
     document.getElementById("stat_customer_count").textContent = row.customer_count ?? "—";
     document.getElementById("stat_avg_amount").textContent = formatNumber(row.avg_total_purchase_amount, 4);
-    document.getElementById("stat_avg_recency").textContent =
-      (row.avg_recency_days == null) ? "—" : String(Math.round(row.avg_recency_days));
     document.getElementById("stat_churn_pct").textContent =
       `${formatNumber(row.churn_percentage, 4)}%`;
 
