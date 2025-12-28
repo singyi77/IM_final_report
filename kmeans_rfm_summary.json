@@ -1,0 +1,62 @@
+[
+  {
+    "KMeans_cluster_RFM": "高消費沉睡客群",
+    "avg_R_score": 2.4685767097966727,
+    "avg_F_score": 3.166358595194085,
+    "avg_M_score": 3.828558225508318,
+    "avg_CAI_5": 2.766,
+    "avg_total_purchase_amount": 1121.6926201478743,
+    "avg_recency_days": 482.54436229205174,
+    "avg_churn_probability": 0.9999811384812706,
+    "churn_percentage": 100.0,
+    "customer_count": 2164
+  },
+  {
+    "KMeans_cluster_RFM": "低價值流失客群",
+    "avg_R_score": 1.7862137862137861,
+    "avg_F_score": 1.680985680985681,
+    "avg_M_score": 1.4282384282384282,
+    "avg_CAI_5": 0,
+    "avg_total_purchase_amount": 46.93527472527472,
+    "avg_recency_days": 598.7019647019647,
+    "avg_churn_probability": 0.9859767446090582,
+    "churn_percentage": 98.43489843489843,
+    "customer_count": 3003
+  },
+  {
+    "KMeans_cluster_RFM": "核心高價值客群",
+    "avg_R_score": 4.173835125448028,
+    "avg_F_score": 5.0,
+    "avg_M_score": 4.444444444444445,
+    "avg_CAI_5": 4.789247311827957,
+    "avg_total_purchase_amount": 2041.736164874552,
+    "avg_recency_days": 194.2831541218638,
+    "avg_churn_probability": 0.7407354185322644,
+    "churn_percentage": 74.01433691756273,
+    "customer_count": 558
+  },
+  {
+    "KMeans_cluster_RFM": "活躍成長客群",
+    "avg_R_score": 4.480897009966777,
+    "avg_F_score": 3.615033222591362,
+    "avg_M_score": 3.595514950166113,
+    "avg_CAI_5": 3.122549019607843,
+    "avg_total_purchase_amount": 1044.691719269103,
+    "avg_recency_days": 159.63372093023256,
+    "avg_churn_probability": 0.7903804787105506,
+    "churn_percentage": 78.61295681063123,
+    "customer_count": 2408
+  },
+  {
+    "KMeans_cluster_RFM": "高消費低頻率客群",
+    "avg_R_score": 4.179282868525896,
+    "avg_F_score": 5.0,
+    "avg_M_score": 4.368525896414343,
+    "avg_CAI_5": 1.1084063745019919,
+    "avg_total_purchase_amount": 1931.98187250996,
+    "avg_recency_days": 197.1394422310757,
+    "avg_churn_probability": 0.7882953748192945,
+    "churn_percentage": 77.68924302788844,
+    "customer_count": 502
+  }
+]

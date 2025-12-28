@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>用戶分群廣告發送系統</title>
+
+  <!-- SheetJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* header */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #111827; /* 深色 */
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .brand{
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .topbar-nav{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-item{
+      position: relative;
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .nav-item:hover{
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    .nav-item.active{
+      background: rgba(37,99,235,0.25);
+      color: #fff;
+      border: 1px solid rgba(37,99,235,0.45);
+    }
+
+    .has-dropdown:hover .dropdown{
+      display: block;
+    }
+
+    .dropdown{
+      display: none;
+      position: absolute;
+      top: 44px;
+      left: 0;
+      min-width: 180px;
+      background: #0b1220;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    }
+
+    .dropdown-item{
+      display: block;
+      padding: 10px 12px;
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .dropdown-item:last-child{
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover{
+      background: rgba(255,255,255,0.08);
+    }
+
+    .topbar-right{
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pill{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.9);
+    }
+    /* body */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background: #f4f6f9;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 64px); /* 扣掉 topbar 高度 */
+    }
+
+    /* 左側分群 */
+    .sidebar {
+      width: 260px;
+      background: #1f2937;
+      color: #fff;
+      padding: 20px;
+      padding-top: 0px;
+
+      /* ✅ 新增 */
+      height: calc(100vh - 64px); /* 扣掉 topbar */
+      overflow-y: auto;
+    }
+    .sidebar-hidden {
+      display: none;
+    }
+    .cluster {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: #374151;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .cluster.active {
+      background: #2563eb;
+    }
+
+    /* 右側 */
+    .content {
+      flex: 1;
+      padding: 30px;
+      padding-top: 0px;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .send-btn {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    table {
+      width: 100%;
+      background: #fff;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    th {
+      background: #f9fafb;
+    }
+
+    /* ===== Modal ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 420px;
+      padding: 20px;
+      border-radius: 12px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    .modal-content textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 6px;
+      padding: 8px;
+    }
+
+    .modal-actions {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .cancel-btn {
+      background: #9ca3af;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .empty-hint {
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      color: #6b7280;
+      text-align: center;
+      padding: 60px 20px;
+      border-radius: 12px;
+      font-size: 18px;
+      margin-top: 40px;
+    }
+    #userTableWrapper {
+      display: none;
+    }
+    .table-scroll {
+      max-height: calc(100vh - 64px - 200px);
+      overflow-y: auto;
+      border-radius: 12px;
+    }
+    .algo-toggle{
+      display:flex;
+      gap:8px;
+      margin: 14px 0 12px;
+    }
+
+    .algo-btn{
+      flex:1;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.12);
+      background:#111827;
+      color: rgba(255,255,255,0.9);
+      cursor:pointer;
+    }
+
+    .algo-btn.active{
+      background:#2563eb;
+      border-color: rgba(37,99,235,0.55);
+      color:#fff;
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="brand">📣 用戶洞察與投放後台</div>
+  </div>
+
+  <nav class="topbar-nav">
+    <a class="nav-item active" href="#" data-page="seg">客群分群中心</a>
+
+    <a class="nav-item" data-page="buy">交易行為洞察</a>
+
+    <a class="nav-item" data-page="view">瀏覽行為洞察</a>
+
+    <a class="nav-item" href="#" data-page="bundle">商品組合優化</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="sidebar">
+
+    <!-- 分群中心 sidebar -->
+    <div id="sidebar-seg">
+      <h2>📊 用戶分群</h2>
+      <div id="clusterList"></div>
+    </div>
+
+    <!-- 洞察 sidebar（交易/瀏覽用） -->
+    <div id="sidebar-insight" style="display:none;">
+      <div class="algo-toggle">
+        <button id="btnKmeans" class="algo-btn active" type="button">KMEANS</button>
+        <button id="btnDbscan" class="algo-btn" type="button">DBSCAN</button>
+      </div>
+
+      <div id="clusterList_kmeans"></div>
+      <div id="clusterList_dbscan" style="display:none;"></div>
+    </div>
+
+  </div>
+
+
+  <div class="content">
+    <!-- 用戶分群 -->
+    <div class="page" id="page-seg">
+      <div class="content-header">
+        <h2 id="clusterTitle">用戶分群</h2>
+        <button class="send-btn" onclick="openAdModal()">📢 發送廣告</button>
+      </div>
+      <!-- 初始提示 -->
+      <div id="emptyHint" class="empty-hint">
+        👈 請於左側選擇欲查看用戶
+      </div>
+      <div class="table-scroll">
+        <table id="userTableWrapper">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody id="userTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ✅ 共用洞察頁（買/看都用這一頁） -->
+    <div class="page" id="page-insight" style="display:none">
+      <div class="content-header">
+        <h2 id="insightPageTitle">洞察</h2>
+        <button class="send-btn" onclick="openAdModal()">📢 發送廣告</button>
+      </div>
+
+      <div id="emptyHint-insight" class="empty-hint">
+        👈 請於左側選擇欲查看族群（顯示雷達圖）
+      </div>
+
+      <div id="insightSummary" class="card" style="display:none;">
+        <h2 id="insightTitle">Cluster</h2>
+
+        <div class="stats">
+          <div>客戶數：<b id="stat_customer_count"></b> 人</div>
+          <div>平均消費金額：約 <b id="stat_avg_amount"></b> 元</div>
+          <div>最近回購間隔：約 <b id="stat_avg_recency"></b> 天</div>
+          <div>流失比例：<b id="stat_churn_pct"></b></div>
+        </div>
+
+        <div style="height: 320px; margin-top: 12px;">
+          <canvas id="insightRadar"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品組合優化 -->
+    <div class="page" id="page-bundle" style="display:none">
+      <div class="content-header" style="align-items:center;">
+        <h2>商品組合優化</h2>
+        <div class="pill" id="bundleMeta" style="display:none;">共 <b id="bundleCount"></b> 組</div>
+      </div>
+
+      <div id="bundleHint" class="empty-hint">
+        📦 依「信心度」排序顯示
+      </div>
+      <div class="table-scroll" id="bundleTableWrapper" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>熱銷組合</th>
+              <th>前項 (買了 A)</th>
+              <th>後項 (跟著買 B)</th>
+              <th>信心度</th>
+              <th>提升度 (Lift)</th>
+              <th>確信度</th>
+            </tr>
+          </thead>
+          <tbody id="bundleTableBody"></tbody>
+        </table>
+      </div>
+      <div class="metric-explain" style="margin:16px 0; line-height:1.8;">
+        <p><b>支持度 (Support)</b>：這組商品組合在所有訂單中出現的比例，用來判斷該組合是否夠普遍。<br/>
+        <b>信心度 (Confidence)</b>：買了 A 的人當中，有多少比例也會買 B，用來預測推薦 A → B 的成功機率。<br/>
+        <b>提升度 (Lift)</b>：買 A 之後買 B 的機率，是一般人買 B 的幾倍，數值大於 1 代表 A 對 B 具有明顯推動效果，是最核心的判斷指標。<br/>
+        <b>確信度 (Conviction)</b>：衡量商品關聯是否穩定、是否像巧合，數值越高代表 A 對 B 的依賴性越強。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 廣告視窗 ===== -->
+<div id="adModal" class="modal">
+  <div class="modal-content">
+    <h2>📢 發送廣告</h2>
+
+    <label>廣告圖片</label>
+    <input type="file" id="adImage" accept="image/*">
+
+    <label>廣告文字</label>
+    <textarea id="adText" placeholder="請輸入廣告內容..."></textarea>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeAdModal()">取消</button>
+      <button class="send-btn" onclick="confirmSendAd()">確認發送</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const summarySourceByPage = {
+    buy: {
+      kmeans: "kmeans_rfm_summary.json",
+      dbscan: "dbscan_summary.json"
+    },
+    view: {
+      kmeans: "kmeans_rfm_summary_interect.json",
+      dbscan: "dbscan_summary_interect.json"
+    }
+  };
+  let workbookData = {};
+  let selectedInsight = null; 
+  let currentCluster = "";
+  let currentAlgo = "kmeans"; // "kmeans" | "dbscan"
+  function setSidebarMode(mode){ // "seg" | "insight"
+    const seg = document.getElementById("sidebar-seg");
+    const insight = document.getElementById("sidebar-insight");
+
+    if(mode === "seg"){
+      seg.style.display = "block";
+      insight.style.display = "none";
+    }else{
+      seg.style.display = "none";
+      insight.style.display = "block";
+      // 進洞察頁時，確保顯示正確 algo list
+      setAlgo(currentAlgo);
+    }
+  }
+  function loadInsightDataByPage(page) {
+    const src = summarySourceByPage[page];
+    if (!src) return;
+    loadKmeansSummaryJson(src.kmeans);
+    loadDbscanSummaryJson(src.dbscan);
+  }
+  function setAlgo(algo){
+    currentAlgo = algo;
+
+    // 按鈕 active
+    document.getElementById("btnKmeans").classList.toggle("active", algo === "kmeans");
+    document.getElementById("btnDbscan").classList.toggle("active", algo === "dbscan");
+
+    // 列表顯示切換
+    document.getElementById("clusterList_kmeans").style.display = (algo === "kmeans") ? "block" : "none";
+    document.getElementById("clusterList_dbscan").style.display = (algo === "dbscan") ? "block" : "none";
+    const card = document.getElementById("insightSummary");
+    if (card) card.style.display = "none";
+    const hint = document.getElementById("emptyHint-insight");
+    if (hint) hint.style.display = "block";
+    selectedInsight = null;
+  }
+  document.getElementById("btnKmeans").addEventListener("click", () => setAlgo("kmeans"));
+  document.getElementById("btnDbscan").addEventListener("click", () => setAlgo("dbscan"));
+  let currentInsightPage = "buy"; // buy | view
+
+  function switchPage(pageKey) {
+    // ✅ 左側 sidebar 顯示控制
+    const sidebar = document.querySelector(".sidebar");
+
+    if (pageKey === "bundle") {
+      sidebar.classList.add("sidebar-hidden");   // 商品組合頁：隱藏左側
+    } else {
+      sidebar.classList.remove("sidebar-hidden"); // 其他頁：顯示左側
+    }
+
+    // === 原本的切頁邏輯 ===
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+
+    // ✅ buy/view 都進共用洞察頁
+    if (pageKey === "buy" || pageKey === "view") {
+      currentInsightPage = pageKey;
+      document.getElementById("page-insight").style.display = "block";
+      document.getElementById("insightPageTitle").textContent =
+        (pageKey === "buy") ? "交易行為洞察" : "瀏覽行為洞察";
+      return;
+    }
+
+    // ✅ 商品組合優化
+    if (pageKey === "bundle") {
+      document.getElementById("page-bundle").style.display = "block";
+      loadBundleXlsxOnce();
+      return;
+    }
+
+    // 其他頁照舊
+    const target = document.getElementById(`page-${pageKey}`);
+    if (target) target.style.display = "block";
+  }
+  
+  fetch("lca_clustered_users_new.xlsx")
+    .then(res => res.arrayBuffer())
+    .then(data => {
+      const workbook = XLSX.read(data, { type: "array" });
+      workbook.SheetNames.forEach(name => {
+        workbookData[name] = XLSX.utils.sheet_to_json(workbook.Sheets[name]);
+      });
+      renderClusterList();
+    });
+
+  document.querySelectorAll(".dropdown-item").forEach(sub => {
+    sub.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const key = sub.dataset.sub;
+      const page = key.split("-")[0]; // buy / view
+
+      switchPage(page);
+
+      console.log("切換子頁功能：", key);
+    });
+  });
+  function renderClusterList() {
+    const list = document.getElementById("clusterList");
+    list.innerHTML = "";
+    Object.keys(workbookData).forEach(cluster => {
+      const div = document.createElement("div");
+      div.className = "cluster";
+      div.innerText = cluster;
+      div.onclick = () => selectCluster(cluster, div);
+      list.appendChild(div);
+    });
+  }
+
+  function selectCluster(name, el) {
+    document.querySelectorAll("#clusterList .cluster").forEach(c => c.classList.remove("active"));
+    el.classList.add("active");
+    currentCluster = name;
+    document.getElementById("clusterTitle").innerText = name;
+
+    document.getElementById("emptyHint").style.display = "none";
+    document.getElementById("userTableWrapper").style.display = "table";
+    
+    const tbody = document.getElementById("userTable");
+    tbody.innerHTML = "";
+    workbookData[name].forEach(u => {
+      tbody.innerHTML += `<tr><td>${u.user_id}</td><td>${u.name}</td></tr>`;
+    });
+  }
+  function updateInsightPanel(titleText, row) {
+    document.getElementById("emptyHint-insight").style.display = "none";
+    document.getElementById("insightSummary").style.display = "block";
+
+    document.getElementById("insightTitle").textContent = titleText;
+    document.getElementById("stat_customer_count").textContent = row.customer_count ?? "—";
+    document.getElementById("stat_avg_amount").textContent = formatNumber(row.avg_total_purchase_amount, 4);
+    document.getElementById("stat_avg_recency").textContent =
+      (row.avg_recency_days == null) ? "—" : String(Math.round(row.avg_recency_days));
+    document.getElementById("stat_churn_pct").textContent =
+      `${formatNumber(row.churn_percentage, 4)}%`;
+
+    renderInsightRadar(row);
+  }
+  
+  /* ===== 廣告邏輯 ===== */
+
+  async function openAdModal() {
+    const page = getCurrentPageKey(); // 你原本就有
+
+    // 1) 分群中心：要先選 Excel 的 currentCluster
+    if (page === "seg") {
+      if (!currentCluster) {
+        alert("請先選擇分群");
+        return;
+      }
+    }
+
+    // 2) 洞察頁：要先選 KMeans/DBSCAN 的 selectedInsight
+    if (page === "buy" || page === "view" || page === "insight") {
+      if (!selectedInsight) {
+        alert("請先在左側選擇一個 KMEANS/DBSCAN 分群");
+        return;
+      }
+    }
+
+    // ✅ 先給一段「預設文字」
+    const adTextEl = document.getElementById("adText");
+    adTextEl.value = "正在為你生成廣告文案…";
+
+    // ✅ 開 modal
+    document.getElementById("adModal").style.display = "block";
+
+    // ✅ 再用 GPT 生成並覆蓋 textarea
+    try {
+      const payload = buildAdGenPayload(page);
+      const res = await fetch("/api/adcopy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      adTextEl.value = data.copy || "（生成失敗，請稍後再試）";
+    } catch (err) {
+      console.error("generate ad copy failed:", err);
+      adTextEl.value = "（生成失敗：請確認後端 /api/adcopy 有啟動，或查看 Console）";
+    }
+  }
+
+  function buildAdGenPayload(page){
+    // 依你目前需求：洞察頁要帶 algo/cluster；分群中心帶 currentCluster
+    if (page === "seg") {
+      return {
+        page,
+        mode: "seg",
+        cluster_label: currentCluster
+      };
+    }
+
+    // 洞察頁（buy/view/insight）
+    return {
+      page,
+      mode: "insight",
+      insight: selectedInsight, // { algo, key, label, page... }
+      // 你也可以加更多欄位：產品/活動/優惠/語氣…
+      tone: "專業但親切",
+      length: "80-120字",
+      cta: "立即查看 / 立即領取"
+    };
+  }
+
+  function closeAdModal() {
+    document.getElementById("adModal").style.display = "none";
+  }
+
+  function confirmSendAd() {
+    const page = getCurrentPageKey();
+    const text = document.getElementById("adText").value;
+    const image = document.getElementById("adImage").files[0];
+
+    let targetLabel = "";
+    let users = [];
+
+    if (page === "seg") {
+      targetLabel = currentCluster;
+      users = workbookData[currentCluster] || [];
+    } else if (page === "insight") {
+      if (!selectedInsight) {
+        alert("請先選擇洞察分群");
+        return;
+      }
+      targetLabel = selectedInsight.label;
+      // ⚠️ 洞察分群的使用者名單你目前沒有資料對應，先留空或之後再串
+      users = [];
+    } else {
+      alert("此頁面不支援投放");
+      return;
+    }
+
+    console.log("📢 發送廣告");
+    console.log("投放對象：", targetLabel);
+    console.log("文字：", text);
+    console.log("圖片：", image);
+    console.log("用戶：", users);
+
+    alert(`已對「${targetLabel}」發送廣告（模擬）`);
+    closeAdModal();
+  }
+
+  function resetInsightUI() {
+    document.querySelectorAll("#clusterList_kmeans .cluster, #clusterList_dbscan .cluster")
+      .forEach(c => c.classList.remove("active"));
+
+    document.getElementById("insightSummary").style.display = "none";
+    document.getElementById("emptyHint-insight").style.display = "block";
+    selectedInsight = null;
+  }
+
+  document.querySelectorAll(".nav-item[data-page]").forEach(item => {
+    item.addEventListener("click", () => {
+      const page = item.dataset.page;
+      switchPage(page);
+
+      if (page === "buy" || page === "view") {
+        setSidebarMode("insight");
+        resetInsightUI();
+        loadInsightDataByPage(page); // ✅ 這行現在會正常跑
+      } else {
+        setSidebarMode("seg");
+      }
+
+      document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+      item.classList.add("active");
+    });
+  });
+
+  document.querySelectorAll(".dropdown-item").forEach(sub => {
+    sub.addEventListener("click", (e) => {
+      e.preventDefault();
+      const key = sub.dataset.sub; // buy-rfm / view-churn ...
+      console.log("切換子頁：", key);
+    });
+  });
+  let insightRadarChart = null;
+  let kmeansDataByCluster = {};  // { "0": rowObj, "1": rowObj, ... }
+
+  async function loadKmeansSummaryJson(url = "kmeans_rfm_summary.json") {
+    const text = await fetch(url).then(r => r.text());
+    const safeText = text.replace(/\bNaN\b/g, "null"); 
+    const arr = JSON.parse(safeText);
+
+    // 建立索引：key = KMeans_cluster_RFM
+    kmeansDataByCluster = {};
+    arr.forEach(row => {
+      const k = row.KMeans_cluster_RFM;
+      kmeansDataByCluster[String(k)] = row;
+    });
+
+    renderKmeansClusterList();
+  }
+  function renderKmeansClusterList() {
+    const container = document.getElementById("clusterList_kmeans");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    // 依 cluster id 排序
+    const keys = Object.keys(kmeansDataByCluster).sort((a,b)=>Number(a)-Number(b));
+
+    keys.forEach(k => {
+      const div = document.createElement("div");
+      div.className = "cluster"; // 用你原本 cluster 樣式
+      div.textContent = `${k}`;
+      div.onclick = () => selectKmeansCluster(k, div);
+      container.appendChild(div);
+    });
+  }
+  function roundTo(n, digits) {
+  if (n === null || n === undefined || Number.isNaN(n)) return null;
+  const m = Math.pow(10, digits);
+  return Math.round(n * m) / m;
+}
+
+function formatNumber(n, digits = null) {
+  if (n === null || n === undefined) return "—";
+  if (digits === null) return String(n);
+  return roundTo(Number(n), digits).toFixed(digits);
+}
+
+function selectKmeansCluster(clusterId, el) {
+  document.querySelectorAll("#clusterList_kmeans .cluster").forEach(c => c.classList.remove("active"));
+  if (el) el.classList.add("active");
+
+  const row = kmeansDataByCluster[String(clusterId)];
+  if (!row) return;
+  selectedInsight = {
+    page: getCurrentPageKey(),        // 你下面會加這個函式
+    algo: "kmeans",
+    key: String(clusterId),
+    label: `KMeans Cluster ${clusterId}`
+  };
+  updateInsightPanel(`KMeans｜ ${clusterId}`, row);
+}
+
+function renderInsightRadar(row) {
+  const ctx = document.getElementById("insightRadar");
+  if (!ctx) return;
+
+  const labels = ["R", "F", "M", "CAI"];
+  const values = [row.avg_R_score ?? 0, row.avg_F_score ?? 0, row.avg_M_score ?? 0, row.avg_CAI_5 ?? 0];
+
+  if (insightRadarChart) {
+    insightRadarChart.data.labels = labels;
+    insightRadarChart.data.datasets[0].data = values;
+    insightRadarChart.update();
+    return;
+  }
+
+  insightRadarChart = new Chart(ctx, {
+    type: "radar",
+    data: { labels, datasets: [{ label: "Avg Scores", data: values }] },
+    options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true } } }
+  });
+}
+function renderKmeansRadar(row) {
+  const ctx = document.getElementById("kmeansRadar");
+  if (!ctx) return;
+
+  const labels = ["R", "F", "M", "CAI"];
+  const values = [
+    row.avg_R_score ?? 0,
+    row.avg_F_score ?? 0,
+    row.avg_M_score ?? 0,
+    row.avg_CAI_5 ?? 0
+  ];
+
+  if (insightRadarChart) {
+    insightRadarChart.data.datasets[0].data = values;
+    insightRadarChart.update();
+    return;
+  }
+
+  insightRadarChart = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Avg Scores",
+        data: values
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+let dbscanDataByCluster = {};  // { "核心高價值活躍客群": rowObj, ... }
+
+async function loadDbscanSummaryJson(url = "dbscan_summary.json") {
+  const text = await fetch(url).then(r => r.text());
+  const safeText = text.replace(/\bNaN\b/g, "null");
+  const arr = JSON.parse(safeText);
+
+  dbscanDataByCluster = {};
+  arr.forEach(row => {
+    const k = row.DBSCAN_cluster;            // ✅ 這裡是中文名稱
+    dbscanDataByCluster[String(k)] = row;
+  });
+
+  renderDbscanClusterList();
+}
+function renderDbscanClusterList() {
+  const container = document.getElementById("clusterList_dbscan");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // DBSCAN 的 key 是中文字串，直接排序即可（可選）
+  const keys = Object.keys(dbscanDataByCluster).sort();
+
+  keys.forEach(k => {
+    const div = document.createElement("div");
+    div.className = "cluster";
+    div.textContent = k; // ✅ 顯示「核心高價值活躍客群」等
+    div.onclick = () => selectDbscanCluster(k, div);
+    container.appendChild(div);
+  });
+}
+function selectDbscanCluster(clusterName, el) {
+  document.querySelectorAll("#clusterList_dbscan .cluster").forEach(c => c.classList.remove("active"));
+  if (el) el.classList.add("active");
+
+  const row = dbscanDataByCluster[String(clusterName)];
+  if (!row) return;
+  selectedInsight = {
+    page: getCurrentPageKey(),
+    algo: "dbscan",
+    key: String(clusterName),
+    label: `DBSCAN｜${clusterName}`
+  };
+  updateInsightPanel(`DBSCAN｜${clusterName}`, row);
+}
+function getCurrentPageKey(){
+  // 找到目前 display = block 的 page
+  const shown = [...document.querySelectorAll(".page")]
+    .find(p => p.style.display !== "none");
+  if(!shown) return "seg";
+  return shown.id.replace("page-", ""); // seg / buy / view / bundle
+}
+function renderDbscanRadar(row) {
+  const ctx = document.getElementById("kmeansRadar"); // ✅ 共用同一張畫布
+  if (!ctx) return;
+
+  const labels = ["R", "F", "M", "CAI"];
+  const values = [
+    row.avg_R_score ?? 0,
+    row.avg_F_score ?? 0,
+    row.avg_M_score ?? 0,
+    row.avg_CAI_5 ?? 0
+  ];
+
+  if (insightRadarChart) {
+    insightRadarChart.data.datasets[0].data = values;
+    insightRadarChart.update();
+    return;
+  }
+
+  insightRadarChart = new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Avg Scores",
+        data: values
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { r: { beginAtZero: true } }
+    }
+  });
+}
+/* ===== 商品組合優化（從 product_combination.xlsx 讀取 A~F 欄，依信心度排序） ===== */
+let bundleRules = null;
+let bundleLoaded = false;
+
+function parseMetric(v){
+  if (v === null || v === undefined) return null;
+  if (typeof v === "number") return v;
+  const s = String(v).trim();
+  if (!s) return null;
+  // 支援 "12.3%" 這種
+  const pct = s.match(/^(-?\d+(\.\d+)?)\s*%$/);
+  if (pct) return Number(pct[1]) / 100;
+  // 一般數字（含逗號）
+  const num = s.replace(/,/g,"");
+  const n = Number(num);
+  return Number.isFinite(n) ? n : null;
+}
+
+async function loadBundleXlsxOnce(){
+  if (bundleLoaded) return;
+  bundleLoaded = true;
+
+  try{
+    const res = await fetch("product_combination.xlsx"); // ✅ 與 index.html 同層
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, { type:"array" });
+    const sheetName = wb.SheetNames[0];
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: null });
+
+    // 只保留 A~F（對應欄位名稱：前項/後項/支持度/信心度/提升度/確信度）
+    bundleRules = rows.map(r => ({
+      A: r["前項 (買了 A)"] ?? r["前項"] ?? null,
+      B: r["後項 (跟著買 B)"] ?? r["後項"] ?? null,
+      confidence: parseMetric(r["信心度"]),
+      lift: parseMetric(r["提升度 (Lift)"] ?? r["提升度"]),
+      conviction: parseMetric(r["確信度"])
+    }))
+    // 過濾掉空列
+    .filter(r => (r.A || r.B) && (r.confidence !== null));
+
+    // 依信心度排名（高→低）；同分再以 Lift 排
+    bundleRules.sort((x,y) => (y.confidence - x.confidence) || ((y.lift ?? -Infinity) - (x.lift ?? -Infinity)));
+
+    renderBundleTable();
+  }catch(err){
+    console.error("loadBundleXlsxOnce failed:", err);
+    document.getElementById("bundleHint").textContent = "❌ 讀取 product_combination.xlsx 失敗：請確認檔案與 index.html 同層，且可被 fetch 存取。";
+  }
+}
+
+function fmtMetric(v, digits=4){
+  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  // 小於 1 的指標多半是比例：用 0.1234 表示；你也可改成百分比顯示
+  return roundTo(Number(v), digits).toFixed(digits);
+}
+
+function renderBundleTable(){
+  const hint = document.getElementById("bundleHint");
+  const wrap = document.getElementById("bundleTableWrapper");
+  const tbody = document.getElementById("bundleTableBody");
+  const meta = document.getElementById("bundleMeta");
+  const countEl = document.getElementById("bundleCount");
+
+  if(!bundleRules || bundleRules.length === 0){
+    hint.style.display = "block";
+    wrap.style.display = "none";
+    meta.style.display = "none";
+    return;
+  }
+
+  hint.style.display = "none";
+  wrap.style.display = "block";
+  meta.style.display = "inline-flex";
+  countEl.textContent = bundleRules.length;
+
+  tbody.innerHTML = "";
+  bundleRules.forEach((r, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.A ?? ""}</td>
+        <td>${r.B ?? ""}</td>
+        <td><b>${fmtMetric(r.confidence)}</b></td>
+        <td>${fmtMetric(r.lift)}</td>
+        <td>${fmtMetric(r.conviction)}</td>
+      </tr>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
+

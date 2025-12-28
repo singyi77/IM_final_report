@@ -1,0 +1,62 @@
+[
+  {
+    "KMeans_cluster_RFM": "低互動中購買流失風險客群",
+    "avg_R_score": 2.5678929765886287,
+    "avg_F_score": 1.4956521739130435,
+    "avg_M_score": 2.8749163879598663,
+    "avg_CAI_5": 1.6652909698996656,
+    "avg_total_purchase_amount": 0.3705685618729097,
+    "avg_recency_days": 154.3103678929766,
+    "avg_churn_probability": 0.675947073025926,
+    "churn_percentage": 67.49163879598662,
+    "customer_count": 1495
+  },
+  {
+    "KMeans_cluster_RFM": "核心高互動高購買客群",
+    "avg_R_score": 4.516688918558078,
+    "avg_F_score": 3.608811748998665,
+    "avg_M_score": 4.030262572318647,
+    "avg_CAI_5": 3.148229259589652,
+    "avg_total_purchase_amount": 0.69826435246996,
+    "avg_recency_days": 61.87449933244326,
+    "avg_churn_probability": 0.0,
+    "churn_percentage": 0.0,
+    "customer_count": 2247
+  },
+  {
+    "KMeans_cluster_RFM": "隱性高互動但流失客群",
+    "avg_R_score": 2.190429205722743,
+    "avg_F_score": 1.4721262950172669,
+    "avg_M_score": 2.655155402072028,
+    "avg_CAI_5": 3.8749892241379307,
+    "avg_total_purchase_amount": 0.32215096201282684,
+    "avg_recency_days": 179.73704982733102,
+    "avg_churn_probability": 0.8213258309917852,
+    "churn_percentage": 81.94375925012334,
+    "customer_count": 2027
+  },
+  {
+    "KMeans_cluster_RFM": "高互動高購買高流失客群",
+    "avg_R_score": 2.170757180156658,
+    "avg_F_score": 3.9838120104438643,
+    "avg_M_score": 3.9942558746736294,
+    "avg_CAI_5": 2.9775195822454306,
+    "avg_total_purchase_amount": 0.6422976501305483,
+    "avg_recency_days": 146.89817232375978,
+    "avg_churn_probability": 0.9298854125825042,
+    "churn_percentage": 92.68929503916449,
+    "customer_count": 1915
+  },
+  {
+    "KMeans_cluster_RFM": "高互動低購買觀望客群",
+    "avg_R_score": 3.254868022501082,
+    "avg_F_score": 3.9061012548680223,
+    "avg_M_score": 1.5577672003461704,
+    "avg_CAI_5": 3.0107356122890527,
+    "avg_total_purchase_amount": 0.0,
+    "avg_recency_days": 108.10904370402423,
+    "avg_churn_probability": 0.5022310667827622,
+    "churn_percentage": 49.80527909995673,
+    "customer_count": 2311
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "DBSCAN_cluster": "沉睡低互動流失客群",
+    "avg_R_score": 1.7698744769874477,
+    "avg_F_score": 1.402510460251046,
+    "avg_M_score": 1.4217573221757323,
+    "avg_CAI_5": 2.9610798548094377,
+    "avg_total_purchase_amount": 0.0,
+    "avg_recency_days": 204.06443514644351,
+    "avg_churn_probability": 0.9551081090597512,
+    "churn_percentage": 94.89539748953975,
+    "customer_count": 1195
+  },
+  {
+    "DBSCAN_cluster": "近期回訪觀望客群",
+    "avg_R_score": 4.4939024390243905,
+    "avg_F_score": 1.5873983739837398,
+    "avg_M_score": 1.41869918699187,
+    "avg_CAI_5": 2.9791115702479343,
+    "avg_total_purchase_amount": 0.0,
+    "avg_recency_days": 62.770325203252035,
+    "avg_churn_probability": 0.0,
+    "churn_percentage": 0.0,
+    "customer_count": 492
+  },
+  {
+    "DBSCAN_cluster": "高互動低購買流失客群",
+    "avg_R_score": 2.202076677316294,
+    "avg_F_score": 3.7843450479233227,
+    "avg_M_score": 1.5646964856230032,
+    "avg_CAI_5": 3.001006389776358,
+    "avg_total_purchase_amount": 0.0,
+    "avg_recency_days": 147.11182108626198,
+    "avg_churn_probability": 0.9270415298202582,
+    "churn_percentage": 91.93290734824281,
+    "customer_count": 1252
+  },
+  {
+    "DBSCAN_cluster": "近期回訪高購買客群",
+    "avg_R_score": 4.474125874125874,
+    "avg_F_score": 1.613986013986014,
+    "avg_M_score": 4.048951048951049,
+    "avg_CAI_5": 2.9981267605633803,
+    "avg_total_purchase_amount": 0.7580419580419581,
+    "avg_recency_days": 62.955244755244756,
+    "avg_churn_probability": 0.0,
+    "churn_percentage": 0.0,
+    "customer_count": 715
+  },
+  {
+    "DBSCAN_cluster": "高購買沉睡流失客群",
+    "avg_R_score": 1.8145363408521302,
+    "avg_F_score": 1.494987468671679,
+    "avg_M_score": 3.9630325814536342,
+    "avg_CAI_5": 3.000419397116645,
+    "avg_total_purchase_amount": 0.6491228070175439,
+    "avg_recency_days": 191.10213032581453,
+    "avg_churn_probability": 0.9611617439020711,
+    "churn_percentage": 96.2406015037594,
+    "customer_count": 1596
+  },
+  {
+    "DBSCAN_cluster": "核心高互動高購買客群",
+    "avg_R_score": 4.521174477696217,
+    "avg_F_score": 4.140033879164314,
+    "avg_M_score": 4.019762845849803,
+    "avg_CAI_5": 3.0082495765104458,
+    "avg_total_purchase_amount": 0.6764539808018069,
+    "avg_recency_days": 61.71710897797854,
+    "avg_churn_probability": 0.0,
+    "churn_percentage": 0.0,
+    "customer_count": 1771
+  },
+  {
+    "DBSCAN_cluster": "高互動低購買活躍客群",
+    "avg_R_score": 4.499527856468366,
+    "avg_F_score": 4.050047214353163,
+    "avg_M_score": 1.5495750708215297,
+    "avg_CAI_5": 3.0222379603399436,
+    "avg_total_purchase_amount": 0.0,
+    "avg_recency_days": 61.99811142587347,
+    "avg_churn_probability": 0.0,
+    "churn_percentage": 0.0,
+    "customer_count": 1059
+  },
+  {
+    "DBSCAN_cluster": "高互動高購買流失風險客群",
+    "avg_R_score": 2.170757180156658,
+    "avg_F_score": 3.9838120104438643,
+    "avg_M_score": 3.9942558746736294,
+    "avg_CAI_5": 2.9775195822454306,
+    "avg_total_purchase_amount": 0.6422976501305483,
+    "avg_recency_days": 146.89817232375978,
+    "avg_churn_probability": 0.9298854125825042,
+    "churn_percentage": 92.68929503916449,
+    "customer_count": 1915
+  }
+]
