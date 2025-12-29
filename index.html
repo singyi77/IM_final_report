@@ -349,7 +349,7 @@
 
         <div class="stats">
           <div>客戶數：<b id="stat_customer_count"></b> 人</div>
-          <div>平均消費金額：約 <b id="stat_avg_amount"></b> 元</div>
+          <div id="avgAmountRow">平均消費金額：約 <b id="stat_avg_amount"></b> 元</div>
           <div>流失比例：<b id="stat_churn_pct"></b></div>
         </div>
 
@@ -486,6 +486,9 @@
       document.getElementById("page-insight").style.display = "block";
       document.getElementById("insightPageTitle").textContent =
         (pageKey === "buy") ? "交易行為洞察" : "瀏覽行為洞察";
+
+      const avgRow = document.getElementById("avgAmountRow");
+      if (avgRow) avgRow.style.display = (pageKey === "buy") ? "block" : "none";
       return;
     }
 
@@ -556,7 +559,12 @@
 
     document.getElementById("insightTitle").textContent = titleText;
     document.getElementById("stat_customer_count").textContent = row.customer_count ?? "—";
-    document.getElementById("stat_avg_amount").textContent = formatNumber(row.avg_total_purchase_amount, 4);
+    if (currentInsightPage === "buy") {
+      document.getElementById("stat_avg_amount").textContent =
+        formatNumber(row.avg_total_purchase_amount, 4);
+    } else {
+      document.getElementById("stat_avg_amount").textContent = "—";
+    }
     document.getElementById("stat_churn_pct").textContent =
       `${formatNumber(row.churn_percentage, 4)}%`;
 
